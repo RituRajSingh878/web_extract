@@ -13,6 +13,14 @@ import json
 import numpy
 
 
+def download(url):
+	
+	# Requests URL and get response object 
+	response = requests.get(url, allow_redirects=True) 
+	
+	open('filename.pdf', 'wb').write(response.content) 
+
+	
 def get_contour_precedence(contour, cols):
 	tolerance_factor = 10
 	origin = cv2.boundingRect(contour)
@@ -65,7 +73,7 @@ def utl():
 	
 	text = ""
 	for c in line_items_coordinates:
-		print(c)
+		# print(c)
 		# cropping image img = image[y0:y1, x0:x1]
 		img = image[c[0][1]:c[1][1], c[0][0]:c[1][0]]
 	
@@ -74,7 +82,7 @@ def utl():
 	
 		# pytesseract image to string to get results
 		text += (pytesseract.image_to_string(thresh1, lang='hin', config='--psm 6'))
-	print(text)
+	# print(text)
 	
 	return text
 
@@ -83,13 +91,13 @@ def get_format():
 
 	extract = []
 	i = 0;
-	for url in links[:1]:
+	for url in links:
 		print("Formating Link ", i)
 		i = i+1
 		d = {}
 		d.update({'page-url':url})
 		
-		if(url[-4:]=='&.pdf'):
+		if(url[-4:]=='.pdf'):
 			d.update({'pdf-url':url})
 		else:
 			
@@ -99,7 +107,7 @@ def get_format():
 				try:
 					
 					link = urljoin(url,link['href'])
-					urllib.request.urlretrieve(link, "filename.pdf")
+					# urllib.request.urlretrieve(link, "filename.pdf")
 					d.update({'pdf-url':link})
 					break
 				except:
@@ -119,11 +127,14 @@ def result():
 	extr = get_format()
 	i = 0;
 	for dt in extr:
-		print("Processing page No.", i)
+		print("Processing pdf No.", i)
 		i=i+1
 		lnk = dt['pdf-url']
-		print(lnk)
-		urllib.request.urlretrieve(lnk, "filename.pdf")
+		
+		if(dt['pdf-url']==['page-url']):
+			urllib.request.urlretrieve(lnk, "filename.pdf")
+		else:
+			download(lnk)	
 		pages =  convert_from_path('filename.pdf', 200)
 		text = ""
 		for page in pages:
@@ -131,7 +142,7 @@ def result():
 			text += utl() # extract text
 			
 		dt.update({'pdf-content':text})
-		print(text)
+		# print(text)
 		
 			
 	return extr
@@ -143,4 +154,4 @@ def get_result():
 		json.dump(res, f, ensure_ascii=True, indent=4)
 	return res	
 
-result()
+get_result()
