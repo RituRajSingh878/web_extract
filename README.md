@@ -3,7 +3,7 @@
 ## For Wiki Extractor Run
 
 ```
-python wiki_extractor -k "val" -n "val" -o "name"
+python wiki_extractor.py -k "val" -n "val" -o "name"
 
 k = keyword to search 
 n = max number of results
